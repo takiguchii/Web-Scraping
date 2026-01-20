@@ -10,10 +10,14 @@ print(f"Tentando conectar em: {url}")
 resposta = requests.get(url, headers=headers)
 
 if resposta.status_code == 200:
-    print("Sucesso! A porta está aberta.")
+    print("Saborr porta está aberta.")
     soup = BeautifulSoup(resposta.text, 'html.parser')
-    
+
     livros = soup.find_all('article', class_='product_pod')
     primeiro_livro = livros[0]
     tag_titulo = primeiro_livro.find('h3').find('a')
     titulo = tag_titulo['title']
+
+    print(f"Saborr titulo do livro:{titulo}")
+else:
+    print("SABOR deu ruim o scraping....")
