@@ -1,5 +1,14 @@
 import requests 
+import mysql.connector
 from bs4 import BeautifulSoup
+
+db_config = {
+    'host': 'localhost',
+    'user': 'root',
+    'password': '170918',
+    'database': 'library_scrape'
+}
+
 
 url = 'http://books.toscrape.com'
 headers = {
