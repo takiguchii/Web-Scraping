@@ -19,18 +19,34 @@ print(f"Tentando conectar em: {url}")
 resposta = requests.get(url, headers=headers)
 
 if resposta.status_code == 200:
-    print("Saborr porta está aberta.")
-    soup = BeautifulSoup(resposta.text, 'html.parser')
-    livros = soup.find_all('article', class_='product_pod')
+    print("Saborr site acessado -> tentando conectar ao banco de dados")
+    try:
+        conexao = mysql.connector.connect(**db_config)
+        cursor = conexao.cursor()
+        print("Saborr -> conectado")
 
-    for livro in livros:
-        tag_titulo = livro.find('h3').find('a')
-        titulo = tag_titulo['title']
-        print(f"Saborr titulo do livro:{titulo}")
+        soup = BeautifulSoup(resposta.text, 'html.parser')
+        livros = soup.find_all('article', class_='product_pod')
 
-        tag_preco = livro.find('p', class_='price_color') # Pegando preço no elemento html
-        preco = tag_preco.text
-        print(f"Saborr preço do livro: {preco}")
+        salve_livros = 0 
+
+
+        for livro in livros:
+            titulo = livro.find('h3').find('a')['title']
+            preco = livro.find('p', class_='price_color').text
+            
+            img_relativa = livro.find('div', class_='image_container').find('img')['src']
+            img_completa = 'http://books.toscrape.com/' + img_relativa.replace('../', '')
+
+            sql = "INSERT INTO livros (titulo, preco, url_imagem) VALUES (%s, %s, %s)"
+            valores = (titulo, preco, img_completa)
+            cursor.execute(sql, valores)
+            salve_livros +=1
+            print(f"\n Sabor sucesso: esse foram os sabores: {salve_livros} que deram certo")
+            conexao.commit()
+
+    except mysql.Connection.Error as erro:
+        print(f"Erro ao conectar ao banco de dados: {erro}")
 
 else:
     print("SABOR deu ruim o scraping....")
